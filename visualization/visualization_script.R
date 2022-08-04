@@ -11,9 +11,31 @@ se = function(x) {
 df_sent <- read.csv('C:/Users/samue/Documents/GitHub/capstone_22/dataset/sent_downsampled.csv')
 df_topic_q <- read.csv('C:/Users/samue/Documents/GitHub/capstone_22/dataset/topic_q_downsampled.csv')
 df_topic_a <- read.csv('C:/Users/samue/Documents/GitHub/capstone_22/dataset/topic_a_downsampled.csv')
-
+df_full <- read.csv('C:/Users/samue/Documents/GitHub/capstone_22/dataset/lawline_data.csv')
 
 # Number of texts per month
+df_full$text_type <- rep(c('Questions', 'Answers'), nrow(df_full)/2)
+
+df_per_month <- df_full %>%
+  filter(text_type == 'Questions') %>%
+  mutate(date = as_datetime(date, format = '%d/%m/%Y'),
+         date = floor_date(date, unit = 'months')) %>%
+  group_by(date) %>%
+  summarize(n_texts = n()) %>%
+  ungroup
+
+ggplot(df_per_month, aes(date, n_texts)) +
+  geom_line(col = "#3447d9") +
+  labs(x = "Date", y = "Texts per month") +
+  theme_minimal() +
+  theme(axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12))
+
+ggsave("C:/Users/samue/Documents/GitHub/capstone_22/plots/texts_by_month.png",
+       width = 10, height = 6)
+
 
 # Average topic distribution
 
